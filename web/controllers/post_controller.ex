@@ -1,6 +1,6 @@
 defmodule ExampleProject.PostController do
   use ExampleProject.Web, :controller
-
+  require Documentr.Logger
   alias ExampleProject.Post
 
   plug :scrub_params, "post" when action in [:create, :update]
@@ -10,17 +10,14 @@ defmodule ExampleProject.PostController do
 
     response_payload = to_string Poison.Encoder.encode(posts,[])
     path_params = %{
-      "path" => %{
-        "method" => "get",
-        "url" => "/posts",
-        "response_type" => "application/json",
-        "request_type" => "application/json",
-        "response_payload" => response_payload,
-        "api_key" => "794190d0-bd7e-11e7-977d-dca90475b70a"
-      }
+      "method" => "get",
+      "url" => "/posts/api",
+      "response_type" => "application/json",
+      "request_type" => "application/json",
+      "response_payload" => response_payload
     }
-    header = [Accepts: "application/json", "Content-Type": "application/json"]
-    HTTPotion.post "http://localhost:4000/v1/api/path", [headers: header, body: to_string Poison.Encoder.encode(path_params,[])]
+
+    Documentr.Logger.post(path_params)
 
     render(conn, "index.json", posts: posts)
   end
